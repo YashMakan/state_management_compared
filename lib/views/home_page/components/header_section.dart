@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
 import 'package:state_management_compared/views/home_page/components/like_bottomsheet.dart';
-import 'package:state_management_compared/widgets/post_provider.dart';
+import 'package:state_management_compared/widgets/post_controller.dart';
 
 import '../../../constants/assets.dart';
 
@@ -15,7 +15,7 @@ class HeaderSection extends StatefulWidget {
 class _HeaderSectionState extends State<HeaderSection> {
   @override
   Widget build(BuildContext context) {
-    final postProvider = Provider.of<PostProvider>(context, listen: false);
+    final controller = Get.find<PostController>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
@@ -32,14 +32,12 @@ class _HeaderSectionState extends State<HeaderSection> {
                   builder: (context) => const LikeButtonSheet());
             },
             style: TextButton.styleFrom(foregroundColor: Colors.black),
-            child: Consumer<PostProvider>(
-              builder: (context, provider, widget) {
-                return Text(
-                  'Total Like Counter: ${provider.posts.isEmpty ? 0 : provider.posts.map((e) => e.likes).reduce((a, b) => a + b)}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                );
-              }
-            ),
+            child: Obx(() {
+              return Text(
+                'Total Like Counter: ${controller.posts.isEmpty ? 0 : controller.posts.map((e) => e.likes).reduce((a, b) => a + b)}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              );
+            }),
           )
           // SizedBox(
           //   child: Row(

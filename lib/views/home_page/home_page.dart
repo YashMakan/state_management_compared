@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:state_management_compared/api/api.dart';
 import 'package:state_management_compared/views/home_page/components/header_section.dart';
 import 'package:state_management_compared/views/home_page/components/story_listview.dart';
-import 'package:state_management_compared/widgets/inherited_home_widget.dart';
+import 'package:state_management_compared/widgets/post_provider.dart';
 
 import 'components/post_section.dart';
 
@@ -20,23 +21,24 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    Api.getPosts(offset: offset).then((_posts) {
-      InheritedHomeWidget.of(context)?.posts = _posts;
-      offset += 10;
-      setState(() {});
-    });
-    scrollController.addListener(() {
-      if (scrollController.position.maxScrollExtent ==
-          scrollController.position.pixels) {
-        Api.getPosts(offset: offset).then((_posts) {
-          if (_posts.isEmpty) {
-            isLoading = false;
-          }
-          InheritedHomeWidget.of(context)?.posts.addAll(_posts);
-          offset += 10;
-          setState(() {});
-        });
-      }
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      final postProvider = Provider.of<PostProvider>(context, listen: false);
+      Api.getPosts(offset: offset).then((newPosts) {
+        postProvider.updatePosts(newPosts);
+        offset += 10;
+      });
+      scrollController.addListener(() {
+        if (scrollController.position.maxScrollExtent ==
+            scrollController.position.pixels) {
+          Api.getPosts(offset: offset).then((newPosts) {
+            if (newPosts.isEmpty) {
+              isLoading = false;
+            }
+            postProvider.addPosts(newPosts);
+            offset += 10;
+          });
+        }
+      });
     });
     super.initState();
   }
@@ -59,50 +61,34 @@ class _HomePageState extends State<HomePage> {
         body: SafeArea(
           child: Column(
             children: [
-              const SizedBox(
-                height: 8,
-              ),
-              HeaderSection(
-                  onLikedUpdated: (value, index) {
-                    InheritedHomeWidget.of(context)?.posts[index].likes =
-                        !value ? 0 : 1;
-                    setState(() {});
-                  }),
-              const SizedBox(
-                height: 16,
-              ),
+              const SizedBox(height: 8),
+              const HeaderSection(),
+              const SizedBox(height: 16),
               Expanded(
-                child: ListView.builder(
-                  controller: scrollController,
-                  itemCount: InheritedHomeWidget.of(context)!.posts.length + 1,
-                  itemBuilder: (context, index) {
-                    if (index ==
-                            InheritedHomeWidget.of(context)?.posts.length &&
-                        isLoading) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(),
-                          ],
-                        ),
-                      );
-                    }
-                    return PostSection(
-                        post: InheritedHomeWidget.of(context)!.posts[index],
-                        index: index,
-                        onLikedUpdated: (index) {
-                          InheritedHomeWidget.of(context)!.posts[index].likes =
-                              InheritedHomeWidget.of(context)!
-                                          .posts[index]
-                                          .likes ==
-                                      1
-                                  ? 0
-                                  : 1;
-                          setState(() {});
-                        });
-                  },
+                child: Consumer<PostProvider>(
+                  builder: (context, postProvider, widget) {
+                    return ListView.builder(
+                      controller: scrollController,
+                      itemCount: postProvider.posts.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == postProvider.posts.length && isLoading) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                CircularProgressIndicator(),
+                              ],
+                            ),
+                          );
+                        }
+                        return PostSection(
+                          index: index,
+                          post: postProvider.posts[index],
+                        );
+                      },
+                    );
+                  }
                 ),
               )
             ],

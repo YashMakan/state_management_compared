@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:state_management_compared/views/home_page/components/like_bottomsheet.dart';
-import 'package:state_management_compared/widgets/inherited_home_widget.dart';
+import 'package:state_management_compared/widgets/post_provider.dart';
 
 import '../../../constants/assets.dart';
 
 class HeaderSection extends StatefulWidget {
-  final Function(bool value, int index) onLikedUpdated;
-
-  const HeaderSection(
-      {Key? key, required this.onLikedUpdated})
-      : super(key: key);
+  const HeaderSection({Key? key}) : super(key: key);
 
   @override
   State<HeaderSection> createState() => _HeaderSectionState();
@@ -18,6 +15,7 @@ class HeaderSection extends StatefulWidget {
 class _HeaderSectionState extends State<HeaderSection> {
   @override
   Widget build(BuildContext context) {
+    final postProvider = Provider.of<PostProvider>(context, listen: false);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
@@ -31,13 +29,16 @@ class _HeaderSectionState extends State<HeaderSection> {
             onPressed: () {
               showModalBottomSheet(
                   context: context,
-                  builder: (cntxt) =>
-                      LikeButtonSheet(posts: InheritedHomeWidget.of(context)!.posts, onLikedUpdated: widget.onLikedUpdated));
+                  builder: (context) => const LikeButtonSheet());
             },
             style: TextButton.styleFrom(foregroundColor: Colors.black),
-            child: Text(
-              'Total Like Counter: ${InheritedHomeWidget.of(context)!.posts.isEmpty ? 0 : InheritedHomeWidget.of(context)!.posts.map((e) => e.likes).reduce((a, b) => a + b)}',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+            child: Consumer<PostProvider>(
+              builder: (context, provider, widget) {
+                return Text(
+                  'Total Like Counter: ${provider.posts.isEmpty ? 0 : provider.posts.map((e) => e.likes).reduce((a, b) => a + b)}',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                );
+              }
             ),
           )
           // SizedBox(

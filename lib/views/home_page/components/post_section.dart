@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:state_management_compared/models/post.dart';
 import 'package:state_management_compared/views/home_page/components/circular_profile_widget.dart';
+import 'package:state_management_compared/widgets/post_provider.dart';
 
 import '../../../constants/assets.dart';
 
 class PostSection extends StatefulWidget {
-  const PostSection(
-      {Key? key,
-      required this.post,
-      required this.onLikedUpdated,
-      required this.index})
-      : super(key: key);
+  const PostSection({
+    Key? key,
+    required this.post,
+    required this.index,
+  }) : super(key: key);
   final Post post;
   final int index;
-  final Function(int) onLikedUpdated;
 
   @override
   State<PostSection> createState() => _PostSectionState();
@@ -83,7 +83,10 @@ class _PostSectionState extends State<PostSection> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    widget.onLikedUpdated(widget.index);
+                    final postProvider =
+                        Provider.of<PostProvider>(context, listen: false);
+                    postProvider.updateLike(widget.index,
+                        postProvider.posts[widget.index].likes == 1 ? 0 : 1);
                   },
                   child: Image.asset(
                     MyAssets.heartIcon,

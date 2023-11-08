@@ -1,4 +1,6 @@
-class Post {
+import 'package:equatable/equatable.dart';
+
+class PostEntity extends Equatable {
   final String profilePicture;
   final String username;
   final List<String> posts;
@@ -6,7 +8,7 @@ class Post {
   final String caption;
   final int comments;
 
-  Post(
+  PostEntity(
       {required this.profilePicture,
       required this.username,
       required this.posts,
@@ -14,14 +16,7 @@ class Post {
       required this.caption,
       required this.comments});
 
-  factory Post.fromJson(Map<String, dynamic> json) => Post(
-        profilePicture: json['profile_picture'],
-        username: json['first_name'],
-        posts: [
-          json['profile_picture'],
-        ],
-        likes: 0,
-        caption: json['street'],
-        comments: json['id'],
-      );
+  @override
+  List<Object?> get props =>
+      [profilePicture, username, posts, likes, caption, comments];
 }

@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:http/http.dart';
-import 'package:state_management_compared/models/post.dart';
+import 'package:state_management_compared/features/home_page/data/models/post.dart';
 
-class Api {
+class HomePageApiService {
   static Future<List<Post>> getPosts(
       {required int offset}) async {
     final response = await get(Uri.parse(

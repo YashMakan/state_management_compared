@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:state_management_compared/views/home_page/components/header_section.dart';
-import 'package:state_management_compared/widgets/post_controller.dart';
+import 'package:state_management_compared/features/home_page/presentation/controllers/post_controller.dart';
 
-import 'components/post_section.dart';
+import '../components/header_section.dart';
+import '../components/post_section.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,6 +18,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    controller.getPosts();
     scrollController.addListener(() {
       if (scrollController.position.maxScrollExtent ==
           scrollController.position.pixels) {

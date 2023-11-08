@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:state_management_compared/models/post.dart';
 import 'package:state_management_compared/views/home_page/components/like_bottomsheet.dart';
+import 'package:state_management_compared/widgets/inherited_home_widget.dart';
 
 import '../../../constants/assets.dart';
 
 class HeaderSection extends StatefulWidget {
-  final List<Post> posts;
   final Function(bool value, int index) onLikedUpdated;
 
   const HeaderSection(
-      {Key? key, required this.posts, required this.onLikedUpdated})
+      {Key? key, required this.onLikedUpdated})
       : super(key: key);
 
   @override
@@ -32,13 +31,12 @@ class _HeaderSectionState extends State<HeaderSection> {
             onPressed: () {
               showModalBottomSheet(
                   context: context,
-                  builder: (context) => LikeButtonSheet(
-                      posts: widget.posts,
-                      onLikedUpdated: widget.onLikedUpdated));
+                  builder: (cntxt) =>
+                      LikeButtonSheet(posts: InheritedHomeWidget.of(context)!.posts, onLikedUpdated: widget.onLikedUpdated));
             },
             style: TextButton.styleFrom(foregroundColor: Colors.black),
             child: Text(
-              'Total Like Counter: ${widget.posts.isEmpty ? 0 : widget.posts.map((e) => e.likes).reduce((a, b) => a + b)}',
+              'Total Like Counter: ${InheritedHomeWidget.of(context)!.posts.isEmpty ? 0 : InheritedHomeWidget.of(context)!.posts.map((e) => e.likes).reduce((a, b) => a + b)}',
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           )

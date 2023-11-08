@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:state_management_compared/core/constants/assets.dart';
 import 'package:state_management_compared/features/home_page/data/models/post.dart';
-import 'package:state_management_compared/features/home_page/presentation/controllers/post_controller.dart';
+import 'package:state_management_compared/features/home_page/presentation/bloc/post_bloc.dart';
 import 'circular_profile_widget.dart';
 
 class PostSection extends StatefulWidget {
@@ -82,7 +82,7 @@ class _PostSectionState extends State<PostSection> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    final controller = Get.find<PostController>();
+                    final controller = BlocProvider.of<PostBloc>(context);
                     controller.updateLike(widget.index,
                         controller.posts[widget.index].likes == 1 ? 0 : 1);
                   },

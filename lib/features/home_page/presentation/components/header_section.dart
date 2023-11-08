@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:state_management_compared/core/constants/assets.dart';
-import 'package:state_management_compared/features/home_page/presentation/controllers/post_controller.dart';
+import 'package:state_management_compared/features/home_page/presentation/bloc/post_bloc.dart';
+import 'package:state_management_compared/features/home_page/presentation/bloc/post_states.dart';
+
 import 'like_bottomsheet.dart';
 
 class HeaderSection extends StatefulWidget {
@@ -14,7 +16,7 @@ class HeaderSection extends StatefulWidget {
 class _HeaderSectionState extends State<HeaderSection> {
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<PostController>();
+    final controller = BlocProvider.of<PostBloc>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
@@ -28,10 +30,13 @@ class _HeaderSectionState extends State<HeaderSection> {
             onPressed: () {
               showModalBottomSheet(
                   context: context,
-                  builder: (context) => const LikeButtonSheet());
+                  builder: (context) => BlocProvider.value(
+                        value: controller,
+                        child: const LikeButtonSheet(),
+                      ));
             },
             style: TextButton.styleFrom(foregroundColor: Colors.black),
-            child: Obx(() {
+            child: BlocBuilder<PostBloc, PostState>(builder: (context, state) {
               return Text(
                 'Total Like Counter: ${controller.posts.isEmpty ? 0 : controller.posts.map((e) => e.likes).reduce((a, b) => a + b)}',
                 style: const TextStyle(fontWeight: FontWeight.bold),

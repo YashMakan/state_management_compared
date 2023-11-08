@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:state_management_compared/features/home_page/presentation/bloc/post_bloc.dart';
 import 'package:state_management_compared/features/home_page/presentation/pages/home_page.dart';
 
 void main() {
@@ -16,7 +18,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      home: BlocProvider(
+        create: (context) => PostBloc(),
+        child: const HomePage(),
+      ),
     );
   }
 }

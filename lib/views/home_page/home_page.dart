@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:state_management_compared/api/api.dart';
 import 'package:state_management_compared/models/post.dart';
 import 'package:state_management_compared/views/home_page/components/header_section.dart';
-import 'package:state_management_compared/views/home_page/components/post_section.dart';
 import 'package:state_management_compared/views/home_page/components/story_listview.dart';
 
-import '../../constants/assets.dart';
+import 'components/post_section.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,23 +14,31 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<Widget> posts;
+  List<Post> posts = [];
+  final ScrollController scrollController = ScrollController();
+  bool isLoading = true;
+  int offset = 0;
 
   @override
   void initState() {
-    posts = List.generate(
-        3,
-        (index) => PostSection(
-            post: Post(
-                profilePicture: MyAssets.postPersons[0],
-                username: "travel_desh",
-                posts: List.generate(6, (index) => MyAssets.posts[0]),
-                likes: 23046,
-                caption:
-                    "I have filmed a small vlog of north Dhaka, and I’m very excited to post on YouTube, will post on YouTube as I’m very excited to post on YouTube, will post on YouTube I’m very excited to post on YouTube, will post on YouTube",
-                comments: 1012,
-                dateTime: DateTime(2022, 7, 15))));
-    posts.insert(0, header());
+    Api.getPosts(offset: offset).then((_posts) {
+      posts = _posts;
+      offset += 10;
+      setState(() {});
+    });
+    scrollController.addListener(() {
+      if (scrollController.position.maxScrollExtent ==
+          scrollController.position.pixels) {
+        Api.getPosts(offset: offset).then((_posts) {
+          if (_posts.isEmpty) {
+            isLoading = false;
+          }
+          posts.addAll(_posts);
+          offset += 10;
+          setState(() {});
+        });
+      }
+    });
     super.initState();
   }
 
@@ -55,15 +63,36 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(
                 height: 8,
               ),
-              const HeaderSection(),
+              HeaderSection(posts: posts, onLikedUpdated: (value, index) {
+                posts[index].likes = !value ? 0 : 1;
+                setState(() {});
+              }),
               const SizedBox(
                 height: 16,
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: posts.length,
+                  controller: scrollController,
+                  itemCount: posts.length + 1,
                   itemBuilder: (context, index) {
-                    return posts[index];
+                    if (index == posts.length && isLoading) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            CircularProgressIndicator(),
+                          ],
+                        ),
+                      );
+                    }
+                    return PostSection(
+                        post: posts[index],
+                        index: index,
+                        onLikedUpdated: (index) {
+                          posts[index].likes = posts[index].likes == 1 ? 0 : 1;
+                          setState(() {});
+                        });
                   },
                 ),
               )

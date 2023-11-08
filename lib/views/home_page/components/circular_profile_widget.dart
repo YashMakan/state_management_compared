@@ -50,7 +50,7 @@ class _CircularProfileWidgetState extends State<CircularProfileWidget> {
                   shape: BoxShape.circle,
                   border: Border.all(
                       color: Colors.white, width: widget.isPost ? 2.5 : 0)),
-              child: Image.asset(
+              child: Image.network(
                 asset,
                 width: widget.isPost ? 32 : 60,
                 fit: BoxFit.contain,

@@ -5,8 +5,15 @@ import 'package:state_management_compared/views/home_page/components/circular_pr
 import '../../../constants/assets.dart';
 
 class PostSection extends StatefulWidget {
-  const PostSection({Key? key, required this.post}) : super(key: key);
+  const PostSection(
+      {Key? key,
+      required this.post,
+      required this.onLikedUpdated,
+      required this.index})
+      : super(key: key);
   final Post post;
+  final int index;
+  final Function(int) onLikedUpdated;
 
   @override
   State<PostSection> createState() => _PostSectionState();
@@ -66,7 +73,7 @@ class _PostSectionState extends State<PostSection> {
               },
               itemCount: post.posts.length,
               itemBuilder: (context, index) {
-                return Image.asset(post.posts[index]);
+                return Image.network(post.posts[index]);
               },
             ),
           ),
@@ -74,9 +81,15 @@ class _PostSectionState extends State<PostSection> {
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
             child: Row(
               children: [
-                Image.asset(
-                  MyAssets.heartIcon,
-                  width: 24,
+                GestureDetector(
+                  onTap: () {
+                    widget.onLikedUpdated(widget.index);
+                  },
+                  child: Image.asset(
+                    MyAssets.heartIcon,
+                    color: post.likes == 1 ? Colors.redAccent : null,
+                    width: 24,
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18.0),
@@ -139,7 +152,7 @@ class _PostSectionState extends State<PostSection> {
                       fontSize: 14),
                 ),
                 TextSpan(
-                    text: post.caption.substring(0, 100),
+                    text: post.caption,
                     style: const TextStyle(color: Colors.black)),
                 TextSpan(
                     text: "...more",

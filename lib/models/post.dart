@@ -2,10 +2,9 @@ class Post {
   final String profilePicture;
   final String username;
   final List<String> posts;
-  final int likes;
+  int likes;
   final String caption;
   final int comments;
-  final DateTime dateTime;
 
   Post(
       {required this.profilePicture,
@@ -13,6 +12,16 @@ class Post {
       required this.posts,
       required this.likes,
       required this.caption,
-      required this.comments,
-      required this.dateTime});
+      required this.comments});
+
+  factory Post.fromJson(Map<String, dynamic> json) => Post(
+        profilePicture: json['profile_picture'],
+        username: json['first_name'],
+        posts: [
+          json['profile_picture'],
+        ],
+        likes: 0,
+        caption: json['street'],
+        comments: json['id'],
+      );
 }

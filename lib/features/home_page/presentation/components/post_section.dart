@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:state_management_compared/core/constants/assets.dart';
 import 'package:state_management_compared/features/home_page/data/models/post.dart';
 import 'package:state_management_compared/features/home_page/presentation/controllers/post_controller.dart';
+
 import 'circular_profile_widget.dart';
 
-class PostSection extends StatefulWidget {
+class PostSection extends ConsumerStatefulWidget {
   const PostSection({
     Key? key,
     required this.post,
@@ -15,10 +16,10 @@ class PostSection extends StatefulWidget {
   final int index;
 
   @override
-  State<PostSection> createState() => _PostSectionState();
+  ConsumerState<PostSection> createState() => _PostSectionState();
 }
 
-class _PostSectionState extends State<PostSection> {
+class _PostSectionState extends ConsumerState<PostSection> {
   late Post post;
   int selectedPostIndex = 0;
   RegExp reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
@@ -32,6 +33,8 @@ class _PostSectionState extends State<PostSection> {
 
   @override
   Widget build(BuildContext context) {
+    ref.watch(postNotifier);
+    final notifier = ref.read(postNotifier.notifier);
     return Container(
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
@@ -82,13 +85,12 @@ class _PostSectionState extends State<PostSection> {
               children: [
                 GestureDetector(
                   onTap: () {
-                    final controller = Get.find<PostController>();
-                    controller.updateLike(widget.index,
-                        controller.posts[widget.index].likes == 1 ? 0 : 1);
+                    ref.read(postNotifier.notifier).updateLike(widget.index,
+                        ref.read(postNotifier.notifier).getPost(widget.index).likes == 1 ? 0 : 1);
                   },
                   child: Image.asset(
                     MyAssets.heartIcon,
-                    color: post.likes == 1 ? Colors.redAccent : null,
+                    color: notifier.getPost(widget.index).likes == 1 ? Colors.redAccent : null,
                     width: 24,
                   ),
                 ),
@@ -137,7 +139,7 @@ class _PostSectionState extends State<PostSection> {
             padding:
                 const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.5),
             child: Text(
-              "${post.likes.toString().replaceAllMapped(reg, mathFunc)} likes",
+              "${notifier.getPost(widget.index).likes.toString().replaceAllMapped(reg, mathFunc)} likes",
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ),

@@ -26,4 +26,20 @@ class Post extends PostEntity {
         caption: json['street'],
         comments: json['id'],
       );
+
+  Post copyWith({
+    String? profilePicture,
+    String? username,
+    List<String>? posts,
+    int? likes,
+    String? caption,
+    int? comments,
+  }) =>
+      Post(
+          profilePicture: profilePicture ?? this.profilePicture,
+          username: username ?? this.username,
+          posts: posts ?? this.posts,
+          likes: likes ?? this.likes,
+          caption: caption ?? this.caption,
+          comments: comments ?? this.comments);
 }

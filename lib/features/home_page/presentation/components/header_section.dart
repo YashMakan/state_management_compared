@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:state_management_compared/core/constants/assets.dart';
 import 'package:state_management_compared/features/home_page/presentation/controllers/post_controller.dart';
+
 import 'like_bottomsheet.dart';
 
-class HeaderSection extends StatefulWidget {
+class HeaderSection extends ConsumerStatefulWidget {
   const HeaderSection({Key? key}) : super(key: key);
 
   @override
-  State<HeaderSection> createState() => _HeaderSectionState();
+  ConsumerState<HeaderSection> createState() => _HeaderSectionState();
 }
 
-class _HeaderSectionState extends State<HeaderSection> {
+class _HeaderSectionState extends ConsumerState<HeaderSection> {
   @override
   Widget build(BuildContext context) {
-    final controller = Get.find<PostController>();
+    ref.watch(postNotifier);
+    final notifier = ref.read(postNotifier.notifier);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
@@ -31,12 +33,10 @@ class _HeaderSectionState extends State<HeaderSection> {
                   builder: (context) => const LikeButtonSheet());
             },
             style: TextButton.styleFrom(foregroundColor: Colors.black),
-            child: Obx(() {
-              return Text(
-                'Total Like Counter: ${controller.posts.isEmpty ? 0 : controller.posts.map((e) => e.likes).reduce((a, b) => a + b)}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              );
-            }),
+            child: Text(
+              'Total Like Counter: ${notifier.totalLikes}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           )
           // SizedBox(
           //   child: Row(
